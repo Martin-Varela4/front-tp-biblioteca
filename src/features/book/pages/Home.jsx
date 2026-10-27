@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { getBooks, deleteBook } from '../service/books.api.js'
-import { getGenres } from '../../genre/service/genres.api.js'
+import { useBookList } from '../hooks/useBookList.js'
 import AdminLayout from '../../../components/layouts/AdminLayout'
 import Button from '../../../components/Button'
 import Spinner from '../../../components/Spinner'
@@ -12,69 +10,22 @@ import { ROUTES } from '../../../routes/index'
 function Home() {
   const navigate = useNavigate()
 
-  const [books, setBooks] = useState([])
-  const [genres, setGenres] = useState([])
-  const [search, setSearch] = useState('')
-  const [selectedGenreId, setSelectedGenreId] = useState('')
-  const [selectedYear, setSelectedYear] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  // Delete modal state
-  const [deleteTarget, setDeleteTarget] = useState(null)
-  const [deleting, setDeleting] = useState(false)
-
-  useEffect(() => {
-    const loadBooks = async () => {
-      try {
-        setLoading(true)
-        setError('')
-
-        const filters = {}
-        if (selectedGenreId) filters.genreId = selectedGenreId
-
-        const data = await getBooks(filters)
-        setBooks(Array.isArray(data) ? data : [])
-      } catch (err) {
-        setError(
-          err.response?.data?.message ||
-          'No se pudieron cargar los libros.'
-        )
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadBooks()
-  }, [selectedGenreId])
-
-  useEffect(() => {
-    getGenres()
-      .then((data) => setGenres(Array.isArray(data) ? data : []))
-      .catch(() => {})
-  }, [])
-
-  const filteredBooks = books.filter((book) => {
-    const matchesTitle = (book.title || '').toLowerCase().includes(search.toLowerCase())
-    const matchesYear = selectedYear
-      ? String(book.publicationYear) === selectedYear
-      : true
-    return matchesTitle && matchesYear
-  })
-
-  async function handleDelete() {
-    if (!deleteTarget) return
-    setDeleting(true)
-    try {
-      await deleteBook(deleteTarget.id)
-      setBooks((prev) => prev.filter((b) => b.id !== deleteTarget.id))
-    } catch (err) {
-      setError(err.response?.data?.message || 'No se pudo eliminar el libro.')
-    } finally {
-      setDeleting(false)
-      setDeleteTarget(null)
-    }
-  }
+  const {
+    genres,
+    filteredBooks,
+    search,
+    setSearch,
+    selectedGenreId,
+    setSelectedGenreId,
+    selectedYear,
+    setSelectedYear,
+    loading,
+    error,
+    deleteTarget,
+    setDeleteTarget,
+    deleting,
+    handleDelete,
+  } = useBookList()
 
   return (
     <AdminLayout title="Biblioteca">

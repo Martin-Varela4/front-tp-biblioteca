@@ -1,27 +1,10 @@
-import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import AdminLayout from '../../../components/layouts/AdminLayout'
 import Button from '../../../components/Button'
 import Spinner from '../../../components/Spinner'
-import { getBookById, createBook, updateBook } from '../service/books.api.js'
-import { getAuthors } from '../../author/service/authors.api.js'
-import { getGenres } from '../../genre/service/genres.api.js'
-import { getShelves } from '../../shelf/service/shelves.api.js'
-import { getSagas } from '../../saga/service/sagas.api.js'
 import { ROUTES } from '../../../routes/index'
-import { bookSchema } from '../schemas/bookSchema.js'
-
-const EMPTY_FORM = {
-  title: '',
-  publicationYear: '',
-  authorId: '',
-  genreId: '',
-  shelfId: '',
-  sagaId: '',
-  isbn: '',
-  synopsis: '',
-  sagaOrder: '',
-}
+import { useBookFormData } from '../hooks/useBookFormData.js'
+import { useBookForm } from '../hooks/useBookForm.js'
 
 const inputCls =
   'w-full h-11 min-h-[44px] px-3.5 text-[15px] rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-colors shadow-2xs'
@@ -44,121 +27,17 @@ export default function BookFormPage() {
   const isEditing = !!id
   const navigate = useNavigate()
 
-  const [form, setForm] = useState(EMPTY_FORM)
-  const [authors, setAuthors] = useState([])
-  const [genres, setGenres] = useState([])
-  const [shelves, setShelves] = useState([])
-  const [sagas, setSagas] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [loadingData, setLoadingData] = useState(true)
-  const [error, setError] = useState('')
-  const [fieldErrors, setFieldErrors] = useState({})
+  const { authors, genres, shelves, sagas, form, setForm, loadingData, error: dataError } =
+    useBookFormData(id, isEditing)
 
-  useEffect(() => {
-    const load = async () => {
-      setLoadingData(true)
-      try {
-        const [authorsData, genresData, shelvesData, sagasData] = await Promise.all([
-          getAuthors(),
-          getGenres(),
-          getShelves(),
-          getSagas(),
-        ])
-        setAuthors(Array.isArray(authorsData) ? authorsData : [])
-        setGenres(Array.isArray(genresData) ? genresData : [])
-        setShelves(Array.isArray(shelvesData) ? shelvesData : [])
-        setSagas(Array.isArray(sagasData) ? sagasData : [])
+  const { fieldErrors, loading, error, handleChange, handleSubmit } = useBookForm({
+    form,
+    setForm,
+    isEditing,
+    id,
+    navigate,
+  })
 
-        if (isEditing) {
-          const book = await getBookById(id)
-          setForm({
-            title: book.title ?? '',
-            publicationYear: book.publicationYear ?? '',
-            authorId: book.author?.id ?? '',
-            genreId: book.genre?.id ?? '',
-            shelfId: book.shelf?.id ?? '',
-            sagaId: book.saga?.id ?? '',
-            isbn: book.isbn ?? '',
-            synopsis: book.synopsis ?? '',
-            sagaOrder: book.sagaOrder ?? '',
-          })
-        }
-      } catch {
-        setError('No se pudieron cargar los datos necesarios para el formulario.')
-      } finally {
-        setLoadingData(false)
-      }
-    }
-    load()
-  }, [id, isEditing])
-
-  function handleChange(e) {
-    const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
-    setFieldErrors((prev) => ({ ...prev, [name]: '' }))
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-
-    let validData
-    try {
-      validData = await bookSchema.validate(
-        {
-          title: form.title.trim(),
-          publicationYear: form.publicationYear,
-          authorId: form.authorId,
-          genreId: form.genreId,
-          shelfId: form.shelfId,
-          sagaId: form.sagaId,
-          isbn: form.isbn,
-          synopsis: form.synopsis,
-          sagaOrder: form.sagaOrder,
-        },
-        { abortEarly: false }
-      )
-      setFieldErrors({})
-    } catch (err) {
-      if (err.name === 'ValidationError') {
-        const errors = {}
-        err.inner.forEach((issue) => {
-          if (issue.path && !errors[issue.path]) {
-            errors[issue.path] = issue.message
-          }
-        })
-        setFieldErrors(errors)
-      }
-      return
-    }
-
-    setLoading(true)
-    setError('')
-
-    const payload = {
-      title: validData.title,
-      publicationYear: validData.publicationYear,
-      authorId: validData.authorId,
-      genreId: validData.genreId,
-      shelfId: validData.shelfId,
-      ...(validData.sagaId ? { sagaId: validData.sagaId } : {}),
-      ...(validData.isbn ? { isbn: validData.isbn } : {}),
-      ...(validData.synopsis ? { synopsis: validData.synopsis } : {}),
-      ...(validData.sagaOrder !== null && validData.sagaOrder !== undefined ? { sagaOrder: validData.sagaOrder } : {}),
-    }
-
-    try {
-      if (isEditing) {
-        await updateBook(id, payload)
-      } else {
-        await createBook(payload)
-      }
-      navigate(ROUTES.HOME)
-    } catch (err) {
-      setError(err.response?.data?.message || 'Ocurrió un error al guardar el libro.')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   if (loadingData) {
     return (
@@ -196,12 +75,12 @@ export default function BookFormPage() {
 
         {/* Form container */}
         <div className="bg-white rounded-xl shadow-xs border border-slate-200/90 p-7 sm:p-9">
-          {error && (
+          {(dataError || error) && (
             <div role="alert" className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-center gap-3">
               <svg className="w-5 h-5 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
               </svg>
-              <span>{error}</span>
+              <span>{dataError || error}</span>
             </div>
           )}
 

@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import AdminLayout from '../../../components/layouts/AdminLayout'
 import Button from '../../../components/Button'
 import Spinner from '../../../components/Spinner'
 import EmptyState from '../../../components/EmptyState'
 import ConfirmModal from '../../../components/ConfirmModal'
-import { getGenres, createGenre, updateGenre, deleteGenre } from '../service/genres.api.js'
 import { genreSchema } from '../schemas/genreSchema.js'
+import { useGenresList } from '../hooks/useGenresList.js'
 
 const inputCls =
   'w-full h-11 min-h-[44px] px-3.5 text-[15px] rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-colors shadow-2xs'
@@ -81,62 +81,18 @@ function GenreModal({ genre, onSave, onClose, saving }) {
 }
 
 export default function GenresPage() {
-  const [genres, setGenres] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [modalTarget, setModalTarget] = useState(null)
-  const [deleteTarget, setDeleteTarget] = useState(null)
-  const [saving, setSaving] = useState(false)
-
-  async function load() {
-    setLoading(true)
-    setError('')
-    try {
-      const data = await getGenres()
-      setGenres(Array.isArray(data) ? data : [])
-    } catch {
-      setError('No se pudieron cargar los géneros literarios.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    load()
-  }, [])
-
-  async function handleSave(data) {
-    setSaving(true)
-    try {
-      if (modalTarget && modalTarget.id) {
-        const updated = await updateGenre(modalTarget.id, data)
-        setGenres((prev) => prev.map((g) => (g.id === modalTarget.id ? { ...g, ...updated } : g)))
-      } else {
-        const created = await createGenre(data)
-        const newGenre = created.genre || created
-        setGenres((prev) => [...prev, newGenre])
-      }
-      setModalTarget(null)
-    } catch (err) {
-      setError(err.response?.data?.message || 'No se pudo guardar el género.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function handleDelete() {
-    if (!deleteTarget) return
-    setSaving(true)
-    try {
-      await deleteGenre(deleteTarget.id)
-      setGenres((prev) => prev.filter((g) => g.id !== deleteTarget.id))
-    } catch (err) {
-      setError(err.response?.data?.message || 'No se pudo eliminar el género.')
-    } finally {
-      setSaving(false)
-      setDeleteTarget(null)
-    }
-  }
+  const {
+    genres,
+    loading,
+    error,
+    saving,
+    modalTarget,
+    setModalTarget,
+    deleteTarget,
+    setDeleteTarget,
+    handleSave,
+    handleDelete,
+  } = useGenresList()
 
   return (
     <AdminLayout title="Géneros">

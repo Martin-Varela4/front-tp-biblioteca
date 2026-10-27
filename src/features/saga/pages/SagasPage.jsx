@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import AdminLayout from '../../../components/layouts/AdminLayout'
 import Button from '../../../components/Button'
 import Spinner from '../../../components/Spinner'
 import EmptyState from '../../../components/EmptyState'
 import ConfirmModal from '../../../components/ConfirmModal'
-import { getSagas, createSaga, updateSaga, deleteSaga } from '../service/sagas.api.js'
 import { sagaSchema } from '../schemas/sagaSchema.js'
+import { useSagasList } from '../hooks/useSagasList.js'
 
 const inputCls =
   'w-full h-11 min-h-[44px] px-3.5 text-[15px] rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-colors shadow-2xs'
@@ -81,62 +81,18 @@ function SagaModal({ saga, onSave, onClose, saving }) {
 }
 
 export default function SagasPage() {
-  const [sagas, setSagas] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [modalTarget, setModalTarget] = useState(null)
-  const [deleteTarget, setDeleteTarget] = useState(null)
-  const [saving, setSaving] = useState(false)
-
-  async function load() {
-    setLoading(true)
-    setError('')
-    try {
-      const data = await getSagas()
-      setSagas(Array.isArray(data) ? data : [])
-    } catch {
-      setError('No se pudieron cargar las sagas literarias.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    load()
-  }, [])
-
-  async function handleSave(data) {
-    setSaving(true)
-    try {
-      if (modalTarget && modalTarget.id) {
-        const updated = await updateSaga(modalTarget.id, data)
-        setSagas((prev) => prev.map((s) => (s.id === modalTarget.id ? { ...s, ...updated } : s)))
-      } else {
-        const created = await createSaga(data)
-        const newSaga = created.saga || created
-        setSagas((prev) => [...prev, newSaga])
-      }
-      setModalTarget(null)
-    } catch (err) {
-      setError(err.response?.data?.message || 'No se pudo guardar la saga.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function handleDelete() {
-    if (!deleteTarget) return
-    setSaving(true)
-    try {
-      await deleteSaga(deleteTarget.id)
-      setSagas((prev) => prev.filter((s) => s.id !== deleteTarget.id))
-    } catch (err) {
-      setError(err.response?.data?.message || 'No se pudo eliminar la saga.')
-    } finally {
-      setSaving(false)
-      setDeleteTarget(null)
-    }
-  }
+  const {
+    sagas,
+    loading,
+    error,
+    saving,
+    modalTarget,
+    setModalTarget,
+    deleteTarget,
+    setDeleteTarget,
+    handleSave,
+    handleDelete,
+  } = useSagasList()
 
   return (
     <AdminLayout title="Sagas">

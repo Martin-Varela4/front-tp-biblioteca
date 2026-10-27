@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import AdminLayout from '../../../components/layouts/AdminLayout'
 import Button from '../../../components/Button'
 import Spinner from '../../../components/Spinner'
 import EmptyState from '../../../components/EmptyState'
 import ConfirmModal from '../../../components/ConfirmModal'
-import { getShelves, createShelf, updateShelf, deleteShelf } from '../service/shelves.api.js'
 import { shelfSchema } from '../schemas/shelfSchema.js'
+import { useShelvesList } from '../hooks/useShelvesList.js'
 
 const inputCls =
   'w-full h-11 min-h-[44px] px-3.5 text-[15px] rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-colors shadow-2xs'
@@ -103,62 +103,18 @@ function ShelfModal({ shelf, onSave, onClose, saving }) {
 }
 
 export default function ShelvesPage() {
-  const [shelves, setShelves] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [modalTarget, setModalTarget] = useState(null)
-  const [deleteTarget, setDeleteTarget] = useState(null)
-  const [saving, setSaving] = useState(false)
-
-  async function load() {
-    setLoading(true)
-    setError('')
-    try {
-      const data = await getShelves()
-      setShelves(Array.isArray(data) ? data : [])
-    } catch {
-      setError('No se pudieron cargar los estantes.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    load()
-  }, [])
-
-  async function handleSave(data) {
-    setSaving(true)
-    try {
-      if (modalTarget && modalTarget.id) {
-        const updated = await updateShelf(modalTarget.id, data)
-        setShelves((prev) => prev.map((s) => (s.id === modalTarget.id ? { ...s, ...updated } : s)))
-      } else {
-        const created = await createShelf(data)
-        const newShelf = created.shelf || created
-        setShelves((prev) => [...prev, newShelf])
-      }
-      setModalTarget(null)
-    } catch (err) {
-      setError(err.response?.data?.message || 'No se pudo guardar el estante.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function handleDelete() {
-    if (!deleteTarget) return
-    setSaving(true)
-    try {
-      await deleteShelf(deleteTarget.id)
-      setShelves((prev) => prev.filter((s) => s.id !== deleteTarget.id))
-    } catch (err) {
-      setError(err.response?.data?.message || 'No se pudo eliminar el estante.')
-    } finally {
-      setSaving(false)
-      setDeleteTarget(null)
-    }
-  }
+  const {
+    shelves,
+    loading,
+    error,
+    saving,
+    modalTarget,
+    setModalTarget,
+    deleteTarget,
+    setDeleteTarget,
+    handleSave,
+    handleDelete,
+  } = useShelvesList()
 
   return (
     <AdminLayout title="Estantes">

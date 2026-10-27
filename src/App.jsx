@@ -11,6 +11,7 @@ import AuthorsPage from './features/author/pages/AuthorsPage'
 import GenresPage from './features/genre/pages/GenresPage'
 import ShelvesPage from './features/shelf/pages/ShelvesPage'
 import SagasPage from './features/saga/pages/SagasPage'
+import LogsTable from './features/logs/pages/LogsPage'
 
 function NotFound() {
   return (
@@ -105,6 +106,15 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <SagasPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={ROUTES.LOGS}
+            element={
+              <ProtectedRoute>
+                <LogsTable />
               </ProtectedRoute>
             }
           />

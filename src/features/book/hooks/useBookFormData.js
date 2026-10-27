@@ -18,13 +18,10 @@ const EMPTY_FORM = {
 }
 
 /**
- * Carga en paralelo los datos auxiliares necesarios para el formulario de libro
- * (autores, géneros, estantes y sagas), y de forma condicional el libro
- * existente cuando se está en modo edición.
- *
- * @param {string|undefined} id       - ID del libro (definido solo en modo edición)
- * @param {boolean}          isEditing - Indica si el formulario es de edición
- *
+
+ * @param {string|undefined} id
+ * @param {boolean}          isEditing
+
  * @returns {{ authors, genres, shelves, sagas, form, setForm, loadingData, error }}
  */
 export function useBookFormData(id, isEditing) {

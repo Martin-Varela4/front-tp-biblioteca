@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react'
 import { getGenres, createGenre, updateGenre, deleteGenre } from '../service/genres.api.js'
 
 /**
- * Gestiona el estado de la lista de géneros literarios y las operaciones CRUD.
- * Carga los géneros al montarse y actualiza el estado local tras cada operación.
- *
+
  * @returns {{
  *   genres,
  *   loading, error,

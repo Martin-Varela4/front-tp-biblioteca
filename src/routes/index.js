@@ -8,4 +8,5 @@ export const ROUTES = {
   GENRES: '/generos',
   SHELVES: '/estantes',
   SAGAS: '/sagas',
+  LOGS: '/admin/logs'
 }

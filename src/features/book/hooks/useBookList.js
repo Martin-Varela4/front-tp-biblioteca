@@ -3,10 +3,6 @@ import { getBooks, deleteBook } from '../service/books.api.js'
 import { getGenres } from '../../genre/service/genres.api.js'
 
 /**
- * Gestiona el estado del catálogo de libros: carga desde la API con filtro
- * de género (server-side), filtros locales de título y año (client-side),
- * lista de géneros para el selector, y operación de eliminación.
- *
  * @returns {{
  *   books, genres, filteredBooks,
  *   search, setSearch,
@@ -51,7 +47,7 @@ export function useBookList() {
   useEffect(() => {
     getGenres()
       .then((data) => setGenres(Array.isArray(data) ? data : []))
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   // Filtrado client-side por título y año; se recalcula solo cuando cambia books, search o selectedYear

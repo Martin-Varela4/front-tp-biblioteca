@@ -4,17 +4,8 @@ import { bookSchema } from '../schemas/bookSchema.js'
 import { ROUTES } from '../../../routes/index'
 
 /**
- * Gestiona el ciclo de vida interactivo del formulario de libro:
- * estado de los campos, limpieza de errores por campo, validación Yup,
- * construcción del payload y envío a la API (crear o actualizar).
- *
+
  * @param {{ form, setForm, isEditing, id, navigate }} params
- *   - form      : objeto de estado actual del formulario
- *   - setForm   : setter del estado del formulario (proveniente de useBookFormData)
- *   - isEditing : indica si se está editando un libro existente
- *   - id        : ID del libro en modo edición
- *   - navigate  : función de navegación de React Router
- *
  * @returns {{ fieldErrors, loading, error, handleChange, handleSubmit }}
  */
 export function useBookForm({ form, setForm, isEditing, id, navigate }) {

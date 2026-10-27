@@ -5,12 +5,14 @@ export async function register({ nombre, email, password, username, adminSetupKe
   const payload = {
     username: username || nombre,
     email,
-    password,
-    adminSetupKey 
+    password
   }
 
-  
-  const { data } = await api.post('/auth/register', payload)
+  const { data } = await api.post('/auth/register', payload, {
+    headers: {
+      'x-admin-setup-key': adminSetupKey
+    }
+  })
   return data?.admin || data
 }
 

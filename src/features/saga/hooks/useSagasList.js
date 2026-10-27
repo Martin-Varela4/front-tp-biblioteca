@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react'
 import { getSagas, createSaga, updateSaga, deleteSaga } from '../service/sagas.api.js'
 
 /**
- * Gestiona el estado de la lista de sagas literarias y las operaciones CRUD.
- * Carga las sagas al montarse y actualiza el estado local tras cada operación.
- *
+
  * @returns {{
  *   sagas,
  *   loading, error,

@@ -17,13 +17,7 @@ const EMPTY_FORM = {
   sagaOrder: '',
 }
 
-/**
 
- * @param {string|undefined} id
- * @param {boolean}          isEditing
-
- * @returns {{ authors, genres, shelves, sagas, form, setForm, loadingData, error }}
- */
 export function useBookFormData(id, isEditing) {
   const [authors, setAuthors] = useState([])
   const [genres, setGenres] = useState([])

@@ -3,11 +3,7 @@ import { createBook, updateBook } from '../service/books.api.js'
 import { bookSchema } from '../schemas/bookSchema.js'
 import { ROUTES } from '../../../routes/index'
 
-/**
 
- * @param {{ form, setForm, isEditing, id, navigate }} params
- * @returns {{ fieldErrors, loading, error, handleChange, handleSubmit }}
- */
 export function useBookForm({ form, setForm, isEditing, id, navigate }) {
   const [fieldErrors, setFieldErrors] = useState({})
   const [loading, setLoading] = useState(false)

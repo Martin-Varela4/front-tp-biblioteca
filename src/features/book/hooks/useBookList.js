@@ -2,17 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { getBooks, deleteBook } from '../service/books.api.js'
 import { getGenres } from '../../genre/service/genres.api.js'
 
-/**
- * @returns {{
- *   books, genres, filteredBooks,
- *   search, setSearch,
- *   selectedGenreId, setSelectedGenreId,
- *   selectedYear, setSelectedYear,
- *   loading, error,
- *   deleteTarget, setDeleteTarget,
- *   deleting, handleDelete
- * }}
- */
 export function useBookList() {
   const [books, setBooks] = useState([])
   const [genres, setGenres] = useState([])

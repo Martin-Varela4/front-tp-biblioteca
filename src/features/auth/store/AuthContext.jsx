@@ -1,17 +1,7 @@
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-} from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 
-import {
-  tokenStorage,
-  setUnauthorizedHandler,
-} from '../../../api/client'
+import { tokenStorage, setUnauthorizedHandler } from '../../../api/client'
 
 import * as authApi from '../service/auth.api.js'
 
@@ -20,9 +10,7 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => tokenStorage.get())
   const [user, setUser] = useState(null)
-  const [isInitializing, setIsInitializing] = useState(
-    () => !!tokenStorage.get(),
-  )
+  const [isInitializing, setIsInitializing] = useState(() => !!tokenStorage.get())
 
   const logout = useCallback(() => {
     tokenStorage.remove()

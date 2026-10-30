@@ -1,36 +1,39 @@
+
 import { useNavigate, useParams } from 'react-router'
-import AdminLayout from '../../../components/layouts/AdminLayout'
-import Button from '../../../components/Button'
-import Spinner from '../../../components/Spinner'
 import { ROUTES } from '../../../routes/index'
 import { useBookFormData } from '../hooks/useBookFormData.js'
 import { useBookForm } from '../hooks/useBookForm.js'
+import AdminLayout from '../../../components/layouts/AdminLayout'
+import Button from '../../../components/Button'
+import Spinner from '../../../components/Spinner'
+import FormField from '../../../components/FormField'
 
 const inputCls =
   'w-full h-11 min-h-[44px] px-3.5 text-[15px] rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-colors shadow-2xs'
-
-function FormField({ label, required, error, children, className = '' }) {
-  return (
-    <div className={`flex flex-col ${className}`}>
-      <label className="text-[14px] font-semibold text-slate-700 flex items-center justify-between mb-1.5">
-        <span>{label}</span>
-        {required && <span className="text-blue-600 text-xs font-normal">Requerido</span>}
-      </label>
-      {children}
-      {error && <span className="mt-1 text-xs text-red-600 font-medium">{error}</span>}
-    </div>
-  )
-}
 
 export default function BookFormPage() {
   const { id } = useParams()
   const isEditing = !!id
   const navigate = useNavigate()
 
-  const { authors, genres, shelves, sagas, form, setForm, loadingData, error: dataError } =
-    useBookFormData(id, isEditing)
+  const {
+    authors,
+    genres,
+    shelves,
+    sagas,
+    form,
+    setForm,
+    loadingData,
+    error: dataError,
+  } = useBookFormData(id, isEditing)
 
-  const { fieldErrors, loading, error, handleChange, handleSubmit } = useBookForm({
+  const {
+    fieldErrors,
+    loading,
+    error,
+    handleChange,
+    handleSubmit,
+  } = useBookForm({
     form,
     setForm,
     isEditing,
@@ -38,13 +41,14 @@ export default function BookFormPage() {
     navigate,
   })
 
-
   if (loadingData) {
     return (
       <AdminLayout title={isEditing ? 'Editar libro' : 'Nuevo libro'}>
         <div className="flex flex-col items-center justify-center py-24 bg-white rounded-xl border border-slate-200">
           <Spinner size="lg" className="text-blue-600" />
-          <span className="mt-4 text-sm font-medium text-slate-500">Cargando datos del libro...</span>
+          <span className="mt-4 text-sm font-medium text-slate-500">
+            Cargando datos del libro...
+          </span>
         </div>
       </AdminLayout>
     )
@@ -53,7 +57,6 @@ export default function BookFormPage() {
   return (
     <AdminLayout title={isEditing ? 'Editar libro' : 'Nuevo libro'}>
       <div className="max-w-4xl">
-        {/* Header contextual */}
         <div className="mb-7">
           <button
             type="button"
@@ -65,15 +68,16 @@ export default function BookFormPage() {
             </svg>
             Volver al catálogo
           </button>
+
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
             {isEditing ? 'Editar libro' : 'Registrar nuevo libro'}
           </h2>
+
           <p className="text-slate-500 text-sm sm:text-[15px] mt-1">
             Completá la información bibliográfica y la ubicación física del ejemplar
           </p>
         </div>
 
-        {/* Form container */}
         <div className="bg-white rounded-xl shadow-xs border border-slate-200/90 p-7 sm:p-9">
           {(dataError || error) && (
             <div role="alert" className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-center gap-3">
@@ -85,7 +89,6 @@ export default function BookFormPage() {
           )}
 
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
-            {/* Título */}
             <FormField label="Título de la obra" required error={fieldErrors.title}>
               <input
                 name="title"
@@ -97,7 +100,6 @@ export default function BookFormPage() {
               />
             </FormField>
 
-            {/* Fila: Año de publicación y Autor */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <FormField label="Año de publicación" required error={fieldErrors.publicationYear}>
                 <input
@@ -122,7 +124,6 @@ export default function BookFormPage() {
               </FormField>
             </div>
 
-            {/* Fila: Género y Estante */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <FormField label="Género" required error={fieldErrors.genreId}>
                 <select name="genreId" value={form.genreId} onChange={handleChange} className={inputCls}>
@@ -145,7 +146,6 @@ export default function BookFormPage() {
               </FormField>
             </div>
 
-            {/* Fila: Saga y Orden */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <FormField label="Saga (opcional)">
                 <select name="sagaId" value={form.sagaId} onChange={handleChange} className={inputCls}>
@@ -170,7 +170,6 @@ export default function BookFormPage() {
               </FormField>
             </div>
 
-            {/* ISBN */}
             <FormField label="Código ISBN (opcional)">
               <input
                 name="isbn"
@@ -181,30 +180,37 @@ export default function BookFormPage() {
               />
             </FormField>
 
-            {/* Sinopsis */}
             <FormField label="Sinopsis o notas del libro (opcional)">
               <textarea
                 name="synopsis"
                 value={form.synopsis}
                 onChange={handleChange}
                 rows={4}
-                className="w-full p-3.5 text-[15px] rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-colors shadow-2xs resize-y"
-                placeholder="Resumen del argumento, estado de conservación o detalles relevantes..."
+                className="w-full p-3.5 text-[15px] rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-colors shadow-2xs resize-none"
+                placeholder="Escribe un breve resumen de la obra..."
               />
             </FormField>
 
-            {/* Actions footer */}
-            <div className="flex items-center gap-3.5 pt-4 border-t border-slate-200">
-              <Button type="submit" variant="primary" size="md" isLoading={loading}>
-                {isEditing ? 'Guardar cambios' : 'Crear libro'}
-              </Button>
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
               <Button
-                variant="secondary"
-                size="md"
+                type="button"
+                variant="ghost"
                 onClick={() => navigate(ROUTES.HOME)}
                 disabled={loading}
               >
                 Cancelar
+              </Button>
+
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={loading}
+              >
+                {loading
+                  ? 'Guardando...'
+                  : isEditing
+                    ? 'Guardar cambios'
+                    : 'Registrar libro'}
               </Button>
             </div>
           </form>

@@ -1,17 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getAuthors, createAuthor, updateAuthor, deleteAuthor } from '../service/authors.api.js'
 
-/**
 
- * @returns {{
- *   authors,
- *   loading, error,
- *   saving,
- *   modalTarget, setModalTarget,
- *   deleteTarget, setDeleteTarget,
- *   handleSave, handleDelete
- * }}
- */
 export function useAuthorsList() {
   const [authors, setAuthors] = useState([])
   const [loading, setLoading] = useState(true)

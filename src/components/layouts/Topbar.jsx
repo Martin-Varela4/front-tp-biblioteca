@@ -39,7 +39,7 @@ export default function Topbar({ title, onMenuToggle }) {
               {email}
             </span>
             <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
-              Administrador
+              Admin
             </span>
           </div>
         </div>
